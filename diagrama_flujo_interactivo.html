@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagrama de Flujo Interactivo V20 - Planta Híbrida FV + Eólico + BESS</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    /* Transiciones suaves y scrollbars prolijos */
+    * { box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,0.5); }
+    .pulse-glow { animation: pulseGlow 2s infinite; }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.02); }
+    }
+    .flow-line {
+      stroke-dasharray: 6;
+      animation: dash 1.5s linear infinite;
+    }
+    @keyframes dash {
+      to { stroke-dashoffset: -12; }
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen p-3 md:p-6">
+
+  <!-- ENCABEZADO PRINCIPAL -->
+  <header class="max-w-7xl mx-auto mb-6 bg-slate-800/80 border border-slate-700/60 backdrop-blur rounded-2xl p-5 shadow-xl">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">
+            Versión V20 Optimizada
+          </span>
+          <span class="px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-full">
+            Trabajo Integrador
+          </span>
+        </div>
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white flex items-center gap-2">
+          ⚡ Planta Híbrida: Solar FV + Eólico + BESS + Red
+        </h1>
+        <p class="text-sm md:text-base text-slate-400 mt-1">
+          Mapeo interactivo del algoritmo de optimización técnico-económica y espacial a 20 años con despacho LP y reserva de degradación.
+        </p>
+      </div>
+
+      <!-- TABS NAVEGACIÓN -->
+      <div class="flex flex-wrap gap-2 p-1.5 bg-slate-950/60 border border-slate-800 rounded-xl">
+        <button onclick="cambiarPestana('pipeline')" id="tab-pipeline"
+          class="tab-btn px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all bg-emerald-600 text-white shadow-md">
+          🧭 1. Pipeline del Script V20
+        </button>
+        <button onclick="cambiarPestana('simulador')" id="tab-simulador"
+          class="tab-btn px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all bg-slate-800/80 hover:bg-slate-700 text-slate-300">
+          ⚡ 2. Simulador Balance Horario
+        </button>
+        <button onclick="cambiarPestana('degradacion')" id="tab-degradacion"
+          class="tab-btn px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all bg-slate-800/80 hover:bg-slate-700 text-slate-300">
+          🔋 3. Look-Ahead 20 Años
+        </button>
+        <button onclick="cambiarPestana('espacio')" id="tab-espacio"
+          class="tab-btn px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all bg-slate-800/80 hover:bg-slate-700 text-slate-300">
+          📐 4. Restricción Espacial
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="max-w-7xl mx-auto">
+
+    <!-- ========================================================================================= -->
+    <!-- PESTAÑA 1: PIPELINE GENERAL V20 (FLOWCHART INTERACTIVO) -->
+    <!-- ========================================================================================= -->
+    <section id="sec-pipeline" class="space-y-6">
+      <!-- Barra de instrucción -->
+      <div class="flex items-center justify-between bg-blue-950/40 border border-blue-800/50 px-4 py-3 rounded-xl text-blue-200 text-sm">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">💡</span>
+          <span><strong>Haz clic sobre cualquier bloque</strong> del diagrama para inspeccionar su lógica matemática, variables clave y el código que lo ejecuta.</span>
+        </div>
+        <span class="hidden md:inline-block text-xs bg-blue-900/60 px-2 py-1 rounded text-blue-300">8 Etapas Consecutivas</span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- ÁREA DEL DIAGRAMA DE FLUJO (8 cols) -->
+        <div class="lg:col-span-7 xl:col-span-8 space-y-4">
+
+          <!-- ETAPA 1 -->
+          <div onclick="seleccionarEtapa(1)" id="etapa-card-1"
+            class="etapa-card cursor-pointer group bg-slate-800/90 hover:bg-slate-750 border-2 border-emerald-500/80 rounded-xl p-4 transition-all shadow-md hover:shadow-emerald-500/10">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold flex items-center justify-center text-sm">
+                  1
+                </span>
+                <div>
+                  <h3 class="font-semibold text-white group-hover:text-emerald-300 transition-colors">
+                    Ingesta de Datos y Perfiles Horarios (8.784 h)
+                  </h3>
+                  <p class="text-xs text-slate-400">Lectura de Excel: Demanda estacional, solar horaria, eólica horaria y bandas tarifarias.</p>
+                </div>
+              </div>
+              <span class="text-xs font-mono bg-slate-900 px-2 py-1 rounded text-slate-400 border border-slate-700">cargar_perfiles()</span>
+            </div>
+          </div>
+
+          <!-- Conector -->
+          <div class="flex justify-center text-slate-500 text-sm font-mono">↓ Parámetros base y perfiles normalizados</div>
+
+          <!-- ETAPA 2 -->
+          <div onclick="seleccionarEtapa(2)" id="etapa-card-2"
+            class="etapa-card cursor-pointer group bg-slate-800/90 hover:bg-slate-750 border-2 border-slate-700 rounded-xl p-4 transition-all shadow-md">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold flex items-center justify-center text-sm">
+                  2
+                </span>
+                <div>
+                  <h3 class="font-semibold text-white group-hover:text-amber-300 transition-colors">
+                    Filtro Espacial y Cero Sombra Eólica (V19.1)
+                  </h3>
+                  <p class="text-xs text-slate-400">Polígono 80,4 ha, espaciamiento eólico 5D (650 m) y cota máxima P_FV permitida.</p>
+                </div>
+              </div>
+              <span class="text-xs font-mono bg-slate-900 px-2 py-1 rounded text-slate-400 border border-slate-700">cargar_restricciones...</span>
+            </div>
+          </div>
+
+          <!-- Conector -->
+          <div class="flex justify-center text-slate-500 text-sm font-mono">↓ Dominio factible de terreno acotado</div>
+
+          <!-- ETAPA 3 -->
+          <div onclick="seleccionarEtapa(3)" id="etapa-card-3"
+            class="etapa-card cursor-pointer group bg-slate-800/90 hover:bg-slate-750 border-2 border-slate-700 rounded-xl p-4 transition-all shadow-md">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 font-bold flex items-center justify-center text-sm">
+                  3
+                </span>
+                <div>
+                  <h3 class="font-semibold text-white group-hover:text-indigo-300 transition-colors">
+                    Definición de Familias Discretas (N_aeros, N_containers)
+                  </h3>
+                  <p class="text-xs text-slate-400">Desacople del espacio entero: se descartan familias incompatibles espacialmente.</p>
+                </div>
+              </div>
+              <span class="text-xs font-mono bg-slate-900 px-2 py-1 rounded text-slate-400 border border-slate-700">(Na, Nc)</span>
+            </div>
+          </div>
+
+          <!-- Conector -->
+          <div class="flex justify-center text-slate-500 text-sm font-mono">↓ Bucle por cada familia factible</div>
+
+          <!-- ETAPA 4 (SUB-BLOQUE BI-NIVEL) -->
+          <div class="p-3 bg-slate-950/60 border border-indigo-900/60 rounded-2xl space-y-3">
+            <div class="text-xs font-semibold uppercase tracking-wider text-indigo-400 px-1">
+              Etapa Bi-Nivel (Optimización Rápida + Validación Fiel)
+            </div>
+
+            <!-- 4A -->
+            <div onclick="seleccionarEtapa(4)" id="etapa-card-4"
+              class="etapa-card cursor-pointer group bg-slate-800/90 hover:bg-slate-750 border-2 border-slate-700 rounded-xl p-3.5 transition-all">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <span class="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 font-bold flex items-center justify-center text-xs">
+                    4A
+                  </span>
+                  <div>
+                    <h4 class="text-sm font-semibold text-white group-hover:text-cyan-300">Exploración Continua con DE + Modelo Surrogado</h4>
+                    <p class="text-xs text-slate-400">Differential Evolution sobre P_FV y P_BESS usando simulación técnica + crédito de arbitraje (35%).</p>
+                  </div>
+                </div>
+                <span class="text-xs font-mono bg-slate-900 px-1.5 py-0.5 rounded text-slate-400 border border-slate-700">evaluar_surrogado_v12</span>
+              </div>
+            </div>
+
+            <!-- Conector -->
+            <div class="flex justify-center text-slate-500 text-xs font-mono">↓ Selección de candidatos diversos (evita clones)</div>
+
+            <!-- 4B -->
+            <div onclick="seleccionarEtapa(5)" id="etapa-card-5"
+              class="etapa-card cursor-pointer group bg-slate-800/90 hover:bg-slate-750 border-2 border-slate-700 rounded-xl p-3.5 transition-all">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <span class="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 font-bold flex items-center justify-center text-xs">
+                    4B
+                  </span>
+                  <div>
+                    <h4 class="text-sm font-semibold text-white group-hover:text-purple-300">Plan de Reserva Multianual de SOH (Look-Ahead)</h4>
+                    <p class="text-xs text-slate-400">Bisección del SOH mínimo técnico año a año. Envolvente hacia atrás para no degradar el BESS antes de tiempo.</p>
+                  </div>
+                </div>
+                <span class="text-xs font-mono bg-slate-900 px-1.5 py-0.5 rounded text-slate-400 border border-slate-700">preparar_plan_degradacion...</span>
+              </div>
+            </div>
+
+            <!-- Conector -->
+            <div class="flex justify-center text-slate-500 text-xs font-mono">↓ Tope de ciclos anuales máximos</div>
+
+            <!-- 4C -->
+            <div onclick="seleccionarEtapa(6)" id="etapa-card-6"
+              class="etapa-card cursor-pointer group bg-slate-800/90 hover:bg-slate-750 border-2 border-slate-700 rounded-xl p-3.5 transition-all">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <span class="w-7 h-7 rounded-lg bg-pink-500/20 border border-pink-500/40 text-pink-400 font-bold flex items-center justify-center text-xs">
+                    4C
+                  </span>
+                  <div>
+                    <h4 class="text-sm font-semibold text-white group-hover:text-pink-300">Despacho Exacto 20 Años en Subproceso Limpio</h4>
+                    <p class="text-xs text-slate-400">Programación Lineal (HiGHS) hora a hora. Aislado en subprocess para máxima velocidad y estabilidad.</p>
+                  </div>
+                </div>
+                <span class="text-xs font-mono bg-slate-900 px-1.5 py-0.5 rounded text-slate-400 border border-slate-700">simular_anio_economico (LP)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Conector -->
+          <div class="flex justify-center text-slate-500 text-sm font-mono">↓ Ranking de mejores familias exactas</div>
+
+          <!-- ETAPA 7 -->
+          <div onclick="seleccionarEtapa(7)" id="etapa-card-7"
+            class="etapa-card cursor-pointer group bg-slate-800/90 hover:bg-slate-750 border-2 border-slate-700 rounded-xl p-4 transition-all shadow-md">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-400 font-bold flex items-center justify-center text-sm">
+                  7
+                </span>
+                <div>
+                  <h3 class="font-semibold text-white group-hover:text-rose-300 transition-colors">
+                    Refinamiento Local por Coordenadas & Cache V17
+                  </h3>
+                  <p class="text-xs text-slate-400">Micro-ajuste de P_FV y P_BESS en las mejores familias y cotejo exacto con soluciones de 0 a 2 aeros.</p>
+                </div>
+              </div>
+              <span class="text-xs font-mono bg-slate-900 px-2 py-1 rounded text-slate-400 border border-slate-700">_refinar_familia_exacto_v20</span>
+            </div>
+          </div>
+
+          <!-- Conector -->
+          <div class="flex justify-center text-slate-500 text-sm font-mono">↓ Elección de configuración de mínimo costo</div>
+
+          <!-- ETAPA 8 -->
+          <div onclick="seleccionarEtapa(8)" id="etapa-card-8"
+            class="etapa-card cursor-pointer group bg-gradient-to-r from-emerald-950/80 to-slate-800 border-2 border-emerald-500/80 rounded-xl p-4 transition-all shadow-xl">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-emerald-500 text-slate-900 font-bold flex items-center justify-center text-sm">
+                  🏆
+                </span>
+                <div>
+                  <h3 class="font-semibold text-emerald-300">
+                    Óptimo Global & Reportes Finales
+                  </h3>
+                  <p class="text-xs text-slate-400">Evolución de compras de red Año 1 vs Año 20, desglose a Valor Presente (VP) y exportación de CSVs.</p>
+                </div>
+              </div>
+              <span class="text-xs font-mono bg-emerald-900/60 px-2 py-1 rounded text-emerald-300 border border-emerald-700/50">generar_analisis_final_v20</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PANEL DE DETALLE / INSPECTOR (4 cols) -->
+        <div class="lg:col-span-5 xl:col-span-4">
+          <div class="sticky top-6 bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-2xl backdrop-blur">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300" id="det-badge">
+                  ETAPA 1
+                </span>
+                <span class="text-sm font-semibold text-white" id="det-titulo">Ingesta de Datos</span>
+              </div>
+              <span class="text-xs text-slate-400 font-mono" id="det-funcion">cargar_perfiles()</span>
+            </div>
+
+            <!-- Contenido explicativo dinámico -->
+            <div class="space-y-4 text-xs md:text-sm text-slate-300">
+              <div>
+                <h4 class="text-xs font-semibold uppercase text-slate-400 mb-1">¿Qué hace el código?</h4>
+                <p id="det-desc" class="leading-relaxed text-slate-300">
+                  Lee la matriz anual de 8.784 horas (año bisiesto 2020) desde las distintas solapas de Excel. Extrae los perfiles de Demanda diferenciando Verano (noviembre a abril) e Invierno (mayo a octubre), el perfil solar normalizado por unidad (P.U.) y las series eólicas de las turbinas GE 3.4 y 3.8 MW.
+                </p>
+              </div>
+
+              <div class="bg-slate-900/80 border border-slate-700/60 p-3 rounded-xl">
+                <h4 class="text-xs font-semibold uppercase text-emerald-400 mb-1.5 flex items-center gap-1.5">
+                  <span>⚙️</span> Variables y Restricciones Clave
+                </h4>
+                <ul id="det-vars" class="space-y-1 font-mono text-xs text-slate-300 list-disc list-inside">
+                  <li>8.784 horas secuenciales (Δt = 1 hora)</li>
+                  <li>Potencia contratada fija = 15.0 MW</li>
+                  <li>Límite de interconexión T1 = 15.0 MW</li>
+                  <li>Tarifa por bandas: Valle ($32), Resto ($65), Pico ($125)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="text-xs font-semibold uppercase text-slate-400 mb-1">Impacto en la Optimización</h4>
+                <p id="det-impacto" class="text-xs text-slate-300 leading-relaxed">
+                  Garantiza que la optimización no compare años desfasados. La demanda estacional y los perfiles meteorológicos quedan indexados en memoria como arrays continuos de NumPy para acelerar millones de operaciones vectorizadas.
+                </p>
+              </div>
+
+              <div>
+                <h4 class="text-xs font-semibold uppercase text-slate-400 mb-1">Snippet de Código Representativo</h4>
+                <pre class="bg-slate-950 p-2.5 rounded-lg text-slate-400 font-mono text-[11px] overflow-x-auto border border-slate-800" id="det-code">
+es_verano = (fechas.month >= 11) | (fechas.month <= 4)
+demanda_mw = np.where(es_verano, dem_ver_24[horas], dem_inv_24[horas])
+fv_pu_sin_limite = solar_final_w / (p_fv_referencia_mw * 1e6)
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================================= -->
+    <!-- PESTAÑA 2: SIMULADOR INTERACTIVO DE BALANCE HORARIO -->
+    <!-- ========================================================================================= -->
+    <section id="sec-simulador" class="hidden space-y-6">
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-700 pb-4 mb-5">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              ⚡ Simulador Interactivo de Despacho Horario (La Física del Script)
+            </h2>
+            <p class="text-xs md:text-sm text-slate-400">
+              Modifica los controles para ver en tiempo real cómo el algoritmo balancea la generación renovable, la batería (BESS) y la red para una hora cualquiera.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30" id="sim-estado-balance">
+              ✓ Balance cerrado (Error 0.0 MW)
+            </span>
+          </div>
+        </div>
+
+        <!-- CONTROLES -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-900/80 p-4 rounded-xl border border-slate-700/60 mb-6">
+          <!-- Demanda -->
+          <div>
+            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+              <span>Demanda Horaria:</span>
+              <span class="text-amber-400 font-mono" id="val-demanda">18.5 MW</span>
+            </div>
+            <input type="range" id="slider-demanda" min="5" max="25" step="0.5" value="18.5"
+              class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" oninput="actualizarSimulador()">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-0.5"><span>5 MW</span><span>25 MW</span></div>
+          </div>
+
+          <!-- Generación FV -->
+          <div>
+            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+              <span>Generación Solar FV:</span>
+              <span class="text-yellow-400 font-mono" id="val-fv">12.0 MW</span>
+            </div>
+            <input type="range" id="slider-fv" min="0" max="25" step="0.5" value="12.0"
+              class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-yellow-400" oninput="actualizarSimulador()">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-0.5"><span>0 MW</span><span>25 MW</span></div>
+          </div>
+
+          <!-- Generación Eólica -->
+          <div>
+            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+              <span>Generación Eólica:</span>
+              <span class="text-cyan-400 font-mono" id="val-eol">6.0 MW</span>
+            </div>
+            <input type="range" id="slider-eol" min="0" max="18" step="0.5" value="6.0"
+              class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400" oninput="actualizarSimulador()">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-0.5"><span>0 MW</span><span>18 MW</span></div>
+          </div>
+
+          <!-- SOC Inicial BESS -->
+          <div>
+            <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+              <span>SOC BESS disponible:</span>
+              <span class="text-emerald-400 font-mono" id="val-soc">60 %</span>
+            </div>
+            <input type="range" id="slider-soc" min="10" max="100" step="1" value="60"
+              class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" oninput="actualizarSimulador()">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-0.5"><span>10% (mín)</span><span>100% (máx)</span></div>
+          </div>
+        </div>
+
+        <!-- CONFIGURACIÓN DE SISTEMA & BANDA -->
+        <div class="flex flex-wrap items-center justify-between gap-4 p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-300 mb-6">
+          <div class="flex items-center gap-4 flex-wrap">
+            <span class="font-semibold text-slate-400">Banda Tarifaria:</span>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="banda" value="Valle" onchange="actualizarSimulador()" class="text-blue-500">
+              <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">Valle ($32)</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="banda" value="Resto" checked onchange="actualizarSimulador()" class="text-emerald-500">
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Resto ($65)</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="banda" value="Pico" onchange="actualizarSimulador()" class="text-rose-500">
+              <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300">Pico ($125)</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-4 text-slate-400">
+            <span>P. Contratada: <strong class="text-white">15.0 MW</strong></span>
+            <span>P_BESS Máx: <strong class="text-white">5.0 MW</strong></span>
+            <span>Capacidad BESS: <strong class="text-white">20.0 MWh</strong></span>
+          </div>
+        </div>
+
+        <!-- ESQUEMA VISUAL DE POTENCIAS -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <!-- Bloque Renovables -->
+          <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-xl text-center flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-semibold text-slate-400 mb-1">Generación Renovable</div>
+              <div class="text-2xl font-bold text-emerald-400 font-mono" id="disp-ren">18.0 MW</div>
+              <div class="text-[11px] text-slate-500 mt-1">
+                Solar: <span id="disp-ren-solar">12.0</span> | Eól: <span id="disp-ren-eol">6.0</span>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+              Potencia Neta: <span id="disp-pneta" class="font-mono font-bold">-0.5 MW</span>
+            </div>
+          </div>
+
+          <!-- Bloque BESS -->
+          <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-xl text-center flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-semibold text-slate-400 mb-1">Batería BESS</div>
+              <div class="text-2xl font-bold font-mono" id="disp-bess-pot">0.0 MW</div>
+              <div class="text-[11px] font-semibold mt-1" id="disp-bess-accion">En espera</div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+              SOC Final: <span id="disp-soc-fin" class="font-mono text-emerald-400 font-bold">60.0%</span>
+            </div>
+          </div>
+
+          <!-- Bloque Red -->
+          <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-xl text-center flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-semibold text-slate-400 mb-1">Red Eléctrica</div>
+              <div class="text-2xl font-bold font-mono text-blue-400" id="disp-red-import">0.5 MW</div>
+              <div class="text-[11px] text-slate-500 mt-1">
+                Límite: 15 MW (<span id="disp-red-pct">3.3%</span> uso)
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+              Costo horario: <span id="disp-costo-horario" class="font-mono text-white font-bold">$32.5</span>
+            </div>
+          </div>
+
+          <!-- Bloque Exportación / Curtailment -->
+          <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-xl text-center flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-semibold text-slate-400 mb-1">Flujo hacia Red (T1)</div>
+              <div class="text-2xl font-bold font-mono text-purple-400" id="disp-export">0.0 MW</div>
+              <div class="text-[11px] text-slate-500 mt-1">
+                Vertido / Curtailment: <span id="disp-curtail" class="text-rose-400">0.0 MW</span>
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+              Sin remuneración económica
+            </div>
+          </div>
+
+          <!-- Bloque Demanda Parque -->
+          <div class="bg-slate-900/90 border-2 border-amber-500/60 p-4 rounded-xl text-center flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-semibold text-amber-300 mb-1">Demanda Abastecida</div>
+              <div class="text-2xl font-bold font-mono text-white" id="disp-demanda-ok">18.5 MW</div>
+              <div class="text-[11px] text-emerald-400 mt-1 font-semibold" id="disp-cumple">
+                ✓ 100% CUBIERTO
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+              No abastecido: <span id="disp-no-abast" class="text-emerald-400 font-mono">0.0 MW</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explicación de la decisión tomada -->
+        <div class="mt-5 p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-xs md:text-sm text-slate-300">
+          <span class="font-semibold text-emerald-400">Decisión del algoritmo para esta hora:</span>
+          <p id="disp-explicacion-despacho" class="mt-1 text-slate-400">
+            La generación renovable abastece parcialmente la demanda. El déficit restante no supera los 15 MW contratados, por lo que la red lo cubre directamente sin necesidad de forzar descarga de la batería (Peak Shaving apagado).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================================= -->
+    <!-- PESTAÑA 3: ESTRATEGIA DE DEGRADACIÓN A 20 AÑOS (LOOK-AHEAD) -->
+    <!-- ========================================================================================= -->
+    <section id="sec-degradacion" class="hidden space-y-6">
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl">
+        <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+          🔋 Planificación Multianual de Vida Útil: ¿Por qué no optimizar año por año de forma miope?
+        </h2>
+        <p class="text-xs md:text-sm text-slate-400 mb-6">
+          En un proyecto a 20 años, la degradación solar anual reduce la generación fotovoltaica año a año. Si la batería se utiliza agresivamente para arbitraje en los primeros años, llega agotada (EOL 70%) al final del proyecto, provocando cortes de demanda irreversibles.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Enfoque Erróneo (Miope) -->
+          <div class="bg-rose-950/30 border border-rose-800/50 rounded-xl p-5">
+            <div class="flex items-center gap-2 text-rose-400 font-bold mb-2">
+              <span class="text-lg">❌</span> Despacho Miope (Sin Look-Ahead)
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed mb-3">
+              Cada año resuelve su propio LP de costos sin mirar el futuro. En los Años 1 a 5 la batería cicla intensamente (2-3 ciclos/día) aprovechando el diferencial Valle-Pico.
+            </p>
+            <div class="space-y-2 font-mono text-xs text-rose-300 bg-slate-950/60 p-3 rounded-lg border border-rose-900/40">
+              <div>Año 1-6: Ahorro alto por arbitraje.</div>
+              <div>Año 7: Batería alcanza SOH 70% (End of Life).</div>
+              <div>Año 12: Paneles solares degradados al 94.6%.</div>
+              <div class="text-rose-400 font-bold">Año 13-20: DÉFICIT INEVITABLE (Cortes de potencia). Configuración descartada por no factible.</div>
+            </div>
+          </div>
+
+          <!-- Enfoque Correcto V20 (Look-Ahead) -->
+          <div class="bg-emerald-950/30 border border-emerald-800/50 rounded-xl p-5">
+            <div class="flex items-center gap-2 text-emerald-400 font-bold mb-2">
+              <span class="text-lg">✓</span> Envolvente Multianual V20 (Look-Ahead Lookback)
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed mb-3">
+              El script ejecuta primero una <strong>bisección</strong> para saber cuánto SOH y cuántos ciclos técnicos son estrictamente obligatorios en el Año 20. Luego reserva esa vida útil hacia atrás.
+            </p>
+            <div class="space-y-2 font-mono text-xs text-emerald-300 bg-slate-950/60 p-3 rounded-lg border border-emerald-900/40">
+              <div>1. Bisección técnica del Año 20 al Año 1.</div>
+              <div>2. Cálculo de ciclos mínimos por Peak Shaving.</div>
+              <div>3. Envolvente: max_ciclos_anio = Margen Remanente.</div>
+              <div class="text-emerald-400 font-bold">4. Garantía técnica: el BESS llega vivo al Año 20 cumpliendo el 100% de la demanda.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla interactiva resumen 20 años -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono border-collapse bg-slate-900/90 rounded-xl overflow-hidden">
+            <thead class="bg-slate-950 text-slate-400 uppercase text-[10px]">
+              <tr>
+                <th class="p-3">Año</th>
+                <th class="p-3">Degradación FV</th>
+                <th class="p-3">SOH Inicio</th>
+                <th class="p-3">SOH Técnico Mínimo</th>
+                <th class="p-3">Ciclos Máx Permitidos</th>
+                <th class="p-3">Rol del BESS</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-300">
+              <tr class="hover:bg-slate-800/50">
+                <td class="p-3 font-bold text-white">Año 1</td>
+                <td class="p-3">0.990 (99.0%)</td>
+                <td class="p-3 text-emerald-400">1.000 (100%)</td>
+                <td class="p-3 text-slate-400">~0.720</td>
+                <td class="p-3 text-cyan-300">Alto margen (~450)</td>
+                <td class="p-3 text-emerald-300">Arbitraje Valle-Pico + Reserva</td>
+              </tr>
+              <tr class="hover:bg-slate-800/50">
+                <td class="p-3 font-bold text-white">Año 5</td>
+                <td class="p-3">0.974 (97.4%)</td>
+                <td class="p-3 text-emerald-400">~0.930 (93%)</td>
+                <td class="p-3 text-slate-400">~0.735</td>
+                <td class="p-3 text-cyan-300">Moderado (~380)</td>
+                <td class="p-3 text-emerald-300">Arbitraje controlado</td>
+              </tr>
+              <tr class="hover:bg-slate-800/50">
+                <td class="p-3 font-bold text-white">Año 10</td>
+                <td class="p-3">0.954 (95.4%)</td>
+                <td class="p-3 text-amber-400">~0.850 (85%)</td>
+                <td class="p-3 text-slate-400">~0.760</td>
+                <td class="p-3 text-cyan-300">Presupuestado (~290)</td>
+                <td class="p-3 text-amber-300">Peak Shaving emergente</td>
+              </tr>
+              <tr class="hover:bg-slate-800/50">
+                <td class="p-3 font-bold text-white">Año 15</td>
+                <td class="p-3">0.934 (93.4%)</td>
+                <td class="p-3 text-amber-400">~0.780 (78%)</td>
+                <td class="p-3 text-slate-400">~0.775</td>
+                <td class="p-3 text-rose-300">Restringido (~160)</td>
+                <td class="p-3 text-rose-300">Peak Shaving prioritario</td>
+              </tr>
+              <tr class="hover:bg-slate-800/50 bg-emerald-950/20">
+                <td class="p-3 font-bold text-white">Año 20</td>
+                <td class="p-3">0.914 (91.4%)</td>
+                <td class="p-3 text-rose-400">~0.715 (71.5%)</td>
+                <td class="p-3 text-rose-400">~0.700 (EOL)</td>
+                <td class="p-3 text-rose-400">Mínimo técnico</td>
+                <td class="p-3 text-emerald-400 font-bold">100% Peak Shaving (Cumple Demanda)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================================= -->
+    <!-- PESTAÑA 4: RESTRICCIÓN ESPACIAL & SOMBRAS -->
+    <!-- ========================================================================================= -->
+    <section id="sec-espacio" class="hidden space-y-6">
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl">
+        <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+          📐 Restricciones Físicas y Espaciales del Predio (V19.1)
+        </h2>
+        <p class="text-xs md:text-sm text-slate-400 mb-6">
+          No todo lo que es económicamente óptimo entra en el terreno. El script impone condiciones geométricas estrictas sobre el polígono disponible (~80,4 hectáreas).
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Solar FV -->
+          <div class="bg-slate-900/80 border border-slate-700 p-4 rounded-xl">
+            <div class="text-yellow-400 font-bold text-sm mb-2 flex items-center gap-1.5">
+              <span>☀️</span> Parque Solar FV (Trackers 1P)
+            </div>
+            <ul class="text-xs space-y-2 text-slate-300">
+              <li><strong>Pitch entre filas:</strong> 6,5 m (evita sombras entre 9:00 y 15:00 h en solsticio de invierno).</li>
+              <li><strong>Ancho rotante:</strong> 2,384 m.</li>
+              <li><strong>GCR (Ground Cover Ratio):</strong> 2,384 / 6,5 ≈ 0,367.</li>
+              <li><strong>Superficie terreno:</strong> A_terreno = A_módulos / GCR.</li>
+            </ul>
+          </div>
+
+          <!-- Eólico -->
+          <div class="bg-slate-900/80 border border-slate-700 p-4 rounded-xl">
+            <div class="text-cyan-400 font-bold text-sm mb-2 flex items-center gap-1.5">
+              <span>💨</span> Aerogeneradores (GE 3.4 / 3.8)
+            </div>
+            <ul class="text-xs space-y-2 text-slate-300">
+              <li><strong>Diámetro de rotor (D):</strong> 130 m.</li>
+              <li><strong>Separación mínima:</strong> 5D = 650 m entre torres.</li>
+              <li><strong>Límite geométrico:</strong> En el polígono de 80,4 ha entran como máximo 5 aerogeneradores.</li>
+              <li><strong>Reserva de screening:</strong> Disco de radio D/2 por aerogenerador.</li>
+            </ul>
+          </div>
+
+          <!-- Restricción V19.1 Sombra Cero -->
+          <div class="bg-slate-900/80 border border-slate-700 p-4 rounded-xl">
+            <div class="text-purple-400 font-bold text-sm mb-2 flex items-center gap-1.5">
+              <span>🚫</span> Sombra Eólica Cero sobre FV
+            </div>
+            <ul class="text-xs space-y-2 text-slate-300">
+              <li>Los molinos proyectan sombras alargadas en horas bajas.</li>
+              <li><strong>V19.1 exige cero sombra</strong> sobre los paneles durante horas de generación solar.</li>
+              <li>Para <strong>3 aeros:</strong> P_FV máx = 23,32 MW.</li>
+              <li>Para <strong>4 aeros:</strong> P_FV máx = 6,93 MW.</li>
+              <li>Para <strong>5 aeros:</strong> 0 MW (Inviable espacialmente).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-slate-950/60 border border-slate-800 rounded-xl text-xs text-slate-400 flex items-center justify-between">
+          <span>📦 <strong>Containers BESS (Gotion):</strong> Dimensiones 6,058 x 2,438 m con separación de seguridad de 4 m en ambos ejes. Ocupan una fracción marginal del predio.</span>
+          <span class="text-emerald-400 font-semibold font-mono">&lt; 0.5% del área total</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JAVASCRIPT: LÓGICA INTERACTIVA -->
+  <script>
+    // -------------------------------------------------------------
+    // BASE DE DATOS DE LAS ETAPAS DEL PIPELINE
+    // -------------------------------------------------------------
+    const etapasData = {
+      1: {
+        badge: "ETAPA 1",
+        titulo: "Ingesta de Datos y Perfiles Horarios",
+        funcion: "cargar_perfiles()",
+        desc: "Lee la matriz anual de 8.784 horas (año bisiesto) desde las solapas del archivo Excel. Separa la demanda en Verano (noviembre-abril) e Invierno (mayo-octubre), normaliza la generación solar en P.U. (por unidad) y carga las curvas de potencia de las turbinas GE 3.4 y 3.8 MW.",
+        vars: [
+          "8.784 horas secuenciales (Δt = 1 hora)",
+          "Potencia contratada fija = 15.0 MW (criterio docente)",
+          "Límite de línea T1 = 15.0 MW",
+          "Bandas horarias: Valle, Resto y Pico"
+        ],
+        impacto: "Indexa todas las series en arrays contiguos de NumPy para permitir cálculos vectorizados ultrarrápidos durante las optimizaciones.",
+        code: `es_verano = (fechas.month >= 11) | (fechas.month <= 4)
+demanda_mw = np.where(es_verano, dem_ver_24[horas], dem_inv_24[horas])
+fv_pu_sin_limite = solar_final_w / (p_fv_referencia_mw * 1e6)`
+      },
+      2: {
+        badge: "ETAPA 2",
+        titulo: "Restricciones Espaciales y Sombras (V19.1)",
+        funcion: "cargar_restricciones_espaciales_v19_1()",
+        desc: "Carga los límites geométricos georreferenciados del predio de 80,4 hectáreas. Define la distancia mínima entre molinos a 5 veces el diámetro de rotor (5D = 650 m) y restringe la potencia fotovoltaica máxima (P_FV,max) para asegurar que los aerogeneradores no arrojen sombra sobre los paneles solares durante las horas de radiación.",
+        vars: [
+          "Polígono predio: 804.164 m² (~80.4 ha)",
+          "Para 3 aeros: P_FV máx = 23.32 MW",
+          "Para 4 aeros: P_FV máx = 6.93 MW",
+          "Para 5 aeros: Incompatible (no hay layout factible)",
+          "0..2 aeros: No limita P_FV dentro del rango económico (<=30 MW)"
+        ],
+        impacto: "Elimina de antemano cualquier configuración de aerogeneradores que no quepa físicamente en el terreno o que afecte la producción solar por sombras.",
+        code: `limites[(3, nc)] = {"factible": True, "pfv_max_mw": 23.3212}
+limites[(4, nc)] = {"factible": True, "pfv_max_mw": 6.9307}
+limites[(5, nc)] = {"factible": False, "pfv_max_mw": 0.0}`
+      },
+      3: {
+        badge: "ETAPA 3",
+        titulo: "Familias Discretas (N_aeros, N_containers)",
+        funcion: "optimizar_por_familias_v20()",
+        desc: "Desacopla el problema de optimización entera-continua. En lugar de buscar a ciegas, genera parejas de enteros (N_aeros, N_containers). Las combinaciones que no cumplen con los requisitos espaciales se descartan automáticamente antes de simular.",
+        vars: [
+          "N_aeros ∈ [0, 4] enteros",
+          "N_containers ∈ [0, 8] enteros (cada uno de 5,015 MWh)",
+          "P_BESS tratada como potencia separada (convertidor)",
+          "Restricción de tasa: P_BESS <= 0.5 * E_BESS (máximo 0.5C)"
+        ],
+        impacto: "Convierte un problema mixto no convexo complejo en subproblemas continuos bien condicionados por familia, garantizando cobertura completa.",
+        code: `for na in range(aeros_min, aeros_max + 1):
+    for nc in range(containers_min, containers_max + 1):
+        if layout_factible(na, nc):
+            familias.append((na, nc))`
+      },
+      4: {
+        badge: "ETAPA 4A",
+        titulo: "Exploración Continua con DE + Surrogado",
+        funcion: "evaluar_surrogado_v12()",
+        desc: "Para cada familia discreta, busca los valores continuos óptimos de P_FV y P_BESS usando Differential Evolution (DE). Para no ejecutar 20 problemas de programación lineal (LP) en cada prueba, utiliza un modelo surrogado rápido basado en simulación técnica y un crédito heurístico de arbitraje (35%).",
+        vars: [
+          "Variables continuas: P_FV [MW] y P_BESS [MW]",
+          "Surrogado ultra rápido: sin solver HiGHS (100x más rápido)",
+          "Crédito conservador de arbitraje: 35% del spread Valle/Pico",
+          "Objetivo: Ordenar y seleccionar los mejores candidatos diversos"
+        ],
+        impacto: "Permite explorar cientos de combinaciones de potencia por segundo sin agotar la memoria ni colapsar la CPU.",
+        code: `costo_sur = float(costo_tecnico - 0.35 * credito_arbitraje_vp)
+res = differential_evolution(objetivo, bounds=bounds, ...)`
+      },
+      5: {
+        badge: "ETAPA 4B",
+        titulo: "Plan de Degradación Look-Ahead a 20 Años",
+        funcion: "preparar_plan_degradacion_multianual()",
+        desc: "Determina por bisección el SOH técnico mínimo de cada año (1 al 20) que evita cortes de demanda. Luego, mediante recursión hacia atrás (backward recursion), reserva los ciclos futuros indispensables para el Peak Shaving de los años 15-20. Asigna a cada año un presupuesto máximo de ciclos (max_ciclos_anio).",
+        vars: [
+          "Degradación FV: 0.99 año 1 a 0.914 año 20 (-0.4%/año)",
+          "Degradación BESS: 0.0025% por ciclo equivalente",
+          "SOH fin de vida (EOL): 70%",
+          "Envolvente de ciclos: B_fin[y] = min(ciclos_max_soh[y], limite_sig)"
+        ],
+        impacto: "Evita la 'miopía' del arbitraje económico temprano, asegurando que la batería tenga capacidad cuando los paneles fotovoltaicos estén más degradados.",
+        code: `soh_min[i], ciclos_min[i] = buscar_soh_minimo_tecnico_anio(...)
+for y in range(19, -1, -1):
+    B_fin[y] = min(ciclos_max_por_soh[y], limite_inicio_siguiente)
+    B_inicio[y] = B_fin[y] - ciclos_min[y]`
+      },
+      6: {
+        badge: "ETAPA 4C",
+        titulo: "Despacho Exacto 20 Años en Subproceso",
+        funcion: "_evaluar_exacto_subproceso_v20()",
+        desc: "Los finalistas de cada familia se evalúan con el modelo matemático exacto: 20 problemas de Programación Lineal (HiGHS LP) consecutivos con restricción de ciclos. Se lanza en un subproceso independiente de Python (subprocess) para liberar memoria C++ y evitar la degradación de rendimiento de HiGHS.",
+        vars: [
+          "20 años x 8.784 h = 175.680 balances horarios exactos",
+          "Solver: HiGHS interior point / simplex",
+          "Condición cíclica anual: SOC final = SOC inicial",
+          "Subprocess aislado: estabilidad total en Windows"
+        ],
+        impacto: "Garantiza fidelidad absoluta de costos a 20 años y cumplimiento horario de demanda sin aproximaciones.",
+        code: `proc = subprocess.run([sys.executable, script, '--cand-pfv', ...])
+sol = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='highs')`
+      },
+      7: {
+        badge: "ETAPA 7",
+        titulo: "Refinamiento Local y Cotejo con Cache V17",
+        funcion: "_refinar_familia_exacto_v20()",
+        desc: "Toma las mejores familias del ranking exacto y ejecuta una búsqueda local por coordenadas reduciendo el paso (0.75 MW -> 0.26 MW). Además, recupera del cache V17 las mejores soluciones de 0, 1 y 2 aerogeneradores (donde no había restricción de sombra eólica) y las revalida exactamente.",
+        vars: [
+          "Búsqueda por coordenadas en (P_FV, P_BESS)",
+          "Reducción de paso: step *= 0.35 en cada ronda",
+          "Integración de histórico V17 (0, 1 y 2 aeros)",
+          "Reevaluación idéntica para comparación justa"
+        ],
+        impacto: "Exprime los últimos miles de dólares de ahorro y permite comparar con el histórico sin repetir cálculos innecesarios.",
+        code: `puntos = [(pf0 - step_fv, pb0), (pf0 + step_fv, pb0), ...]
+step_fv *= 0.35
+step_pb *= 0.35`
+      },
+      8: {
+        badge: "ETAPA 8",
+        titulo: "Óptimo Global y Reportes Finales",
+        funcion: "generar_analisis_final_v20()",
+        desc: "Selecciona el diseño ganador de menor costo total descontado (CAPEX + OPEX + Costo de Red a WACC 8%). Compara la evolución del Año 1 vs Año 20 (mostrando cómo el aumento de compra a la red responde a la degradación conjunta de paneles y baterías) y genera los reportes en CSV y TXT.",
+        vars: [
+          "WACC = 8.0% anual",
+          "Escalamiento tarifario = 2.5% anual",
+          "Costo total descontado a 20 años",
+          "Archivos: evolucion_20_anios, desglose_economico, plan_degradacion"
+        ],
+        impacto: "Entrega la justificación técnica y económica definitiva requerida para el informe del Trabajo Integrador.",
+        code: `vp = flujo_nominal / (1.0 + wacc) ** anio
+costo_total_20 = capex.total_usd + float(detalle_20['VP flujo anual [USD]'].sum())`
+      }
+    };
+
+    // -------------------------------------------------------------
+    // SELECCIONAR Y MOSTRAR DETALLE DE ETAPA
+    // -------------------------------------------------------------
+    function seleccionarEtapa(id) {
+      // Quitar bordes activos
+      document.querySelectorAll(".etapa-card").forEach(el => {
+        el.classList.remove("border-emerald-500", "border-2", "shadow-emerald-500/20");
+        el.classList.add("border-slate-700");
+      });
+
+      // Activar la seleccionada
+      const activa = document.getElementById("etapa-card-" + id);
+      if (activa) {
+        activa.classList.remove("border-slate-700");
+        activa.classList.add("border-emerald-500", "border-2", "shadow-emerald-500/20");
+      }
+
+      // Actualizar datos en el panel inspector
+      const data = etapasData[id];
+      if (!data) return;
+
+      document.getElementById("det-badge").innerText = data.badge;
+      document.getElementById("det-titulo").innerText = data.titulo;
+      document.getElementById("det-funcion").innerText = data.funcion;
+      document.getElementById("det-desc").innerText = data.desc;
+      document.getElementById("det-impacto").innerText = data.impacto;
+      document.getElementById("det-code").innerText = data.code;
+
+      const ulVars = document.getElementById("det-vars");
+      ulVars.innerHTML = "";
+      data.vars.forEach(v => {
+        const li = document.createElement("li");
+        li.innerText = v;
+        ulVars.appendChild(li);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // CAMBIO DE PESTAÑAS
+    // -------------------------------------------------------------
+    function cambiarPestana(id) {
+      // Ocultar todas las secciones
+      document.getElementById("sec-pipeline").classList.add("hidden");
+      document.getElementById("sec-simulador").classList.add("hidden");
+      document.getElementById("sec-degradacion").classList.add("hidden");
+      document.getElementById("sec-espacio").classList.add("hidden");
+
+      // Mostrar la seleccionada
+      document.getElementById("sec-" + id).classList.remove("hidden");
+
+      // Actualizar botones
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("bg-emerald-600", "text-white", "shadow-md");
+        btn.classList.add("bg-slate-800/80", "text-slate-300");
+      });
+      const btnActivo = document.getElementById("tab-" + id);
+      if (btnActivo) {
+        btnActivo.classList.remove("bg-slate-800/80", "text-slate-300");
+        btnActivo.classList.add("bg-emerald-600", "text-white", "shadow-md");
+      }
+
+      if (id === 'simulador') {
+        actualizarSimulador();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // LÓGICA DEL SIMULADOR DE BALANCE HORARIO
+    // -------------------------------------------------------------
+    function actualizarSimulador() {
+      // Valores de entrada
+      const demanda = parseFloat(document.getElementById("slider-demanda").value);
+      const fv = parseFloat(document.getElementById("slider-fv").value);
+      const eol = parseFloat(document.getElementById("slider-eol").value);
+      const socInicialPct = parseFloat(document.getElementById("slider-soc").value);
+      const bandaEl = document.querySelector('input[name="banda"]:checked');
+      const banda = bandaEl ? bandaEl.value : "Resto";
+
+      // Actualizar etiquetas numéricas de los sliders
+      document.getElementById("val-demanda").innerText = demanda.toFixed(1) + " MW";
+      document.getElementById("val-fv").innerText = fv.toFixed(1) + " MW";
+      document.getElementById("val-eol").innerText = eol.toFixed(1) + " MW";
+      document.getElementById("val-soc").innerText = socInicialPct.toFixed(0) + " %";
+
+      // Parámetros fijos de la simulación horaria
+      const P_CONTRATADA = 15.0; // MW
+      const LIMITE_T1 = 15.0;    // MW
+      const P_BESS_MAX = 5.0;    // MW
+      const E_BESS_CAP = 20.0;   // MWh
+      const SOC_MIN = 0.10;
+      const SOC_MAX = 1.00;
+      const ETA_C = 0.95;
+      const ETA_D = 0.95;
+      const tarifas = { "Valle": 32.0, "Resto": 65.0, "Pico": 125.0 };
+      const tarifa = tarifas[banda];
+
+      // Estado inicial del SOC en MWh
+      let socActual = (socInicialPct / 100.0) * E_BESS_CAP;
+      const e_soc_min = E_BESS_CAP * SOC_MIN;
+      const e_soc_max = E_BESS_CAP * SOC_MAX;
+
+      // 1. Balance preliminar
+      const renovable = fv + eol;
+      const p_neta = demanda - renovable;
+      const deficit = Math.max(p_neta, 0.0);
+      const excedente = Math.max(-p_neta, 0.0);
+
+      let carga_ren = 0.0;
+      let descarga_obl = 0.0;
+      let carga_red = 0.0;
+      let explicacion = "";
+
+      // 2. Si hay excedente renovable -> Cargar BESS
+      if (excedente > 0) {
+        const margen_soc_carga = Math.max(0.0, (e_soc_max - socActual) / ETA_C);
+        carga_ren = Math.min(excedente, P_BESS_MAX, margen_soc_carga);
+        socActual += carga_ren * ETA_C;
+      }
+
+      // 3. Si hay déficit -> ¿Supera los 15 MW de la red?
+      const descarga_necesaria = Math.max(deficit - P_CONTRATADA, 0.0);
+      if (descarga_necesaria > 0) {
+        const max_descarga_soc = Math.max(0.0, (socActual - e_soc_min) * ETA_D);
+        descarga_obl = Math.min(descarga_necesaria, P_BESS_MAX, max_descarga_soc);
+        socActual -= descarga_obl / ETA_D;
+      }
+
+      // 4. Red para consumo
+      const red_consumo = Math.min(Math.max(deficit - descarga_obl, 0.0), P_CONTRATADA);
+
+      // 5. Carga desde la red en Valle (si hay margen)
+      if (banda === "Valle") {
+        const margen_p_bess = Math.max(0.0, P_BESS_MAX - carga_ren);
+        const margen_red = Math.max(0.0, P_CONTRATADA - red_consumo);
+        const margen_soc = Math.max(0.0, (e_soc_max - socActual) / ETA_C);
+        carga_red = Math.min(margen_p_bess, margen_red, margen_soc);
+        socActual += carga_red * ETA_C;
+      }
+
+      // 6. Importación de red total, exportación y vertido
+      const red_import = red_consumo + carga_red;
+      const excedente_rem = Math.max(excedente - carga_ren, 0.0);
+      const export_red = Math.min(excedente_rem, LIMITE_T1);
+      const curtailment = Math.max(excedente_rem - export_red, 0.0);
+
+      // 7. Demanda no abastecida
+      const no_abast = Math.max(deficit - descarga_obl - red_consumo, 0.0);
+
+      // 8. Costo horario
+      const costo = red_import * tarifa;
+
+      // 9. Balance cerrado
+      const balanceError = Math.abs(renovable + descarga_obl + red_import + no_abast - demanda - carga_ren - carga_red - export_red - curtailment);
+
+      // Construcción de la explicación dinámica
+      if (no_abast > 0.001) {
+        explicacion = `🚨 ALERTA: Hay ${no_abast.toFixed(2)} MW de demanda NO ABASTECIDA. El déficit (${deficit.toFixed(2)} MW) superó el límite de red (15 MW) y la batería no tuvo suficiente energía o potencia para cubrir el restante.`;
+      } else if (descarga_obl > 0) {
+        explicacion = `⚡ PEAK SHAVING ACTIVO: El déficit (${deficit.toFixed(2)} MW) superaba la potencia contratada (15 MW). La batería descargó obligatoriamente ${descarga_obl.toFixed(2)} MW para mantener la red exactamente en su límite sin penalizaciones.`;
+      } else if (carga_ren > 0) {
+        explicacion = `☀️ CARGA RENOVABLE: Se generó un excedente limpio de ${excedente.toFixed(2)} MW. El BESS absorbió ${carga_ren.toFixed(2)} MW. ` + (export_red > 0 ? `Se exportaron ${export_red.toFixed(2)} MW a la red T1.` : '');
+      } else if (carga_red > 0) {
+        explicacion = `🌙 CARGA DE RED EN VALLE: Aprovechando la tarifa barata ($32/MWh), la batería se carga con ${carga_red.toFixed(2)} MW de la red utilizando potencia remanente sin superar los 15 MW.`;
+      } else {
+        explicacion = `⚖️ OPERACIÓN NORMAL: La demanda (${demanda.toFixed(2)} MW) se cubre con renovables (${renovable.toFixed(2)} MW) y red (${red_consumo.toFixed(2)} MW). No se requiere forzar a la batería.`;
+      }
+
+      // Actualizar UI del display
+      document.getElementById("disp-ren").innerText = renovable.toFixed(1) + " MW";
+      document.getElementById("disp-ren-solar").innerText = fv.toFixed(1);
+      document.getElementById("disp-ren-eol").innerText = eol.toFixed(1);
+      document.getElementById("disp-pneta").innerText = (p_neta >= 0 ? "+" : "") + p_neta.toFixed(1) + " MW";
+
+      const elBessPot = document.getElementById("disp-bess-pot");
+      const elBessAcc = document.getElementById("disp-bess-accion");
+      if (descarga_obl > 0) {
+        elBessPot.innerText = "-" + descarga_obl.toFixed(2) + " MW";
+        elBessPot.className = "text-2xl font-bold font-mono text-rose-400";
+        elBessAcc.innerText = "Descargando (Peak Shaving)";
+        elBessAcc.className = "text-[11px] font-semibold mt-1 text-rose-400";
+      } else if (carga_ren > 0) {
+        elBessPot.innerText = "+" + carga_ren.toFixed(2) + " MW";
+        elBessPot.className = "text-2xl font-bold font-mono text-emerald-400";
+        elBessAcc.innerText = "Cargando con Excedente FV/Eol";
+        elBessAcc.className = "text-[11px] font-semibold mt-1 text-emerald-400";
+      } else if (carga_red > 0) {
+        elBessPot.innerText = "+" + carga_red.toFixed(2) + " MW";
+        elBessPot.className = "text-2xl font-bold font-mono text-blue-400";
+        elBessAcc.innerText = "Cargando de Red (Valle)";
+        elBessAcc.className = "text-[11px] font-semibold mt-1 text-blue-400";
+      } else {
+        elBessPot.innerText = "0.0 MW";
+        elBessPot.className = "text-2xl font-bold font-mono text-slate-400";
+        elBessAcc.innerText = "Standby (En espera)";
+        elBessAcc.className = "text-[11px] font-semibold mt-1 text-slate-400";
+      }
+
+      const socFinPct = (socActual / E_BESS_CAP) * 100.0;
+      document.getElementById("disp-soc-fin").innerText = socFinPct.toFixed(1) + " %";
+
+      document.getElementById("disp-red-import").innerText = red_import.toFixed(2) + " MW";
+      document.getElementById("disp-red-pct").innerText = ((red_import / P_CONTRATADA) * 100).toFixed(1) + "%";
+      document.getElementById("disp-costo-horario").innerText = "$" + costo.toFixed(1);
+
+      document.getElementById("disp-export").innerText = export_red.toFixed(2) + " MW";
+      document.getElementById("disp-curtail").innerText = curtailment.toFixed(2) + " MW";
+
+      document.getElementById("disp-demanda-ok").innerText = (demanda - no_abast).toFixed(2) + " MW";
+      const elCumple = document.getElementById("disp-cumple");
+      const elNoAbast = document.getElementById("disp-no-abast");
+      if (no_abast > 0.001) {
+        elCumple.innerText = "❌ DÉFICIT DE POTENCIA";
+        elCumple.className = "text-[11px] text-rose-400 mt-1 font-bold";
+        elNoAbast.innerText = no_abast.toFixed(2) + " MW";
+        elNoAbast.className = "text-rose-400 font-mono font-bold";
+      } else {
+        elCumple.innerText = "✓ 100% CUBIERTO";
+        elCumple.className = "text-[11px] text-emerald-400 mt-1 font-semibold";
+        elNoAbast.innerText = "0.0 MW";
+        elNoAbast.className = "text-emerald-400 font-mono";
+      }
+
+      document.getElementById("disp-explicacion-despacho").innerText = explicacion;
+      document.getElementById("sim-estado-balance").innerText = balanceError < 1e-4 ? "✓ Balance Físico Cerrado (Error 0.00 MW)" : `⚠️ Desbalance: ${balanceError.toFixed(4)} MW`;
+    }
+
+    // Iniciar con etapa 1
+    window.addEventListener("DOMContentLoaded", () => {
+      seleccionarEtapa(1);
+    });
+  </script>
+</body>
+</html>

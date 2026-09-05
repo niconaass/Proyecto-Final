@@ -1,0 +1,58 @@
+TRABAJO INTEGRADOR - ANÁLISIS FINAL DEL ÓPTIMO V13
+========================================================================
+
+DISEÑO ÓPTIMO
+P_FV                         : 15.2414 MW
+Aerogeneradores              : 5 (17.150 MW instalados)
+BESS potencia                 : 3.7272 MW
+BESS energía                  : 20.060 MWh (4 containers)
+Duración nominal BESS         : 5.382 h
+Potencia contratada           : 15.0 MW
+
+RESULTADO ECONÓMICO
+CAPEX total                   : USD 30,752,935
+VP operación 20 años          : USD 36,605,376
+COSTO TOTAL 20 AÑOS           : USD 67,358,311
+
+EVOLUCIÓN AÑO 1 -> AÑO 20
+Generación FV año 1           : 34,155.8 MWh
+Generación FV año 20          : 31,533.7 MWh
+Variación generación FV       : -7.68 %
+Factor FV año 1 / año 20      : 0.990 / 0.914
+SOH BESS inicio               : 100.00 %
+SOH BESS final año 20         : 84.44 %
+Capacidad BESS final año 20   : 16.939 MWh
+Ciclos acumulados             : 6,224.0
+Compra red año 1              : 24,539.6 MWh
+Compra red año 20             : 25,912.5 MWh
+Aumento compra red            : +1,372.9 MWh (+5.59 %)
+Costo red año 1               : USD 1,674,248
+Costo red año 20 nominal      : USD 2,872,634
+Costo red año 20 a precios A1 : USD 1,796,912
+
+BALANCE 20 AÑOS
+Exportación acumulada         : 389,560.5 MWh (sin remuneración)
+Demanda no abastecida         : 0.000000 MWh
+Horas sin abastecer           : 0
+Uso terreno screening         : 31.20 %
+
+NOTA:
+El aumento de compra de red respecto del año 1 refleja la evolución conjunta del
+sistema bajo los mismos perfiles base: degradación FV, pérdida de capacidad BESS
+por ciclos y cambios del despacho económico. No se atribuye exclusivamente a una
+única tecnología. El layout espacial sigue siendo un screening y no un micrositing final.
+
+DESGLOSE DEL COSTO TOTAL A VALOR PRESENTE
+CAPEX FV                    : USD     9,358,235 (13.89 %)
+CAPEX eólico                : USD    16,292,500 (24.19 %)
+CAPEX BESS energía          : USD     3,811,400 ( 5.66 %)
+CAPEX BESS potencia         : USD       890,799 ( 1.32 %)
+CAPEX fijo proyecto         : USD       400,000 ( 0.59 %)
+VP OPEX FV                  : USD     1,380,569 ( 2.05 %)
+VP OPEX eólico              : USD     4,329,619 ( 6.43 %)
+VP OPEX BESS                : USD     1,022,615 ( 1.52 %)
+VP potencia contratada      : USD     9,549,720 (14.18 %)
+VP red Valle                : USD     3,051,659 ( 4.53 %)
+VP red Resto                : USD     8,450,406 (12.55 %)
+VP red Pico                 : USD     8,820,789 (13.10 %)
+VP reemplazo BESS           : USD             0 ( 0.00 %)

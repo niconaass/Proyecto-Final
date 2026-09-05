@@ -1,0 +1,19 @@
+# Entornos virtuales de Python
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# Archivos temporales de bloqueo de Office / Excel
+~$*.xlsx
+~$*.xls
+~$*.xlsm
+*.tmp
+
+# VS Code / IDEs
+.vscode/
+.idea/
+
+# Archivos de depuración temporal
+*.log
